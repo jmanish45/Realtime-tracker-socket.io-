@@ -19,6 +19,7 @@ io.on('connection', (socket) => {
 });
 
 app.get('/', function(req, res) {
+  console.log('Rendering index.ejs');
   res.render('index');
 });
 

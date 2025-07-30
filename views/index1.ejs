@@ -1,7 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>Realtime Tracker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,7 +16,21 @@
       referrerpolicy="no-referrer"
     />
   </head>
-<body>
+  <body
+    class="bg-gray-100 min-h-screen flex flex-col items-center justify-center"
+  >
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+      <h1 class="text-2xl font-bold text-center mb-6 text-blue-600">
+        Realtime Tracker
+      </h1>
+      <div id="tracker-list" class="space-y-4">
+        <!-- Realtime tracked items will appear here -->
+        <div class="text-gray-500 text-center">Waiting for updates...</div>
+      </div>
+    </div>
+    
+    
+
     <div class="map"></div>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
@@ -29,7 +42,5 @@
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
-    <h1>Welcome to the Realtime Tracker</h1>
-    <p>This is a simple application to demonstrate realtime tracking using Socket.io and Leaflet.</p>
-</body>
+  </body>
 </html>
