@@ -1,23 +1,23 @@
 const socket = io();
 console.log('Socket.io client connected');
 
-const map = L.map("map").setView([0,0], 16);
+const map = L.map("map").setView([0,0], 2); // Start with wider zoom
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "OpenStreetMap",
 }).addTo(map);
 
-let myMarker;
+const markers = {};
+let centerOnce = false; // Only center on your location once
 
 if(navigator.geolocation) {
     navigator.geolocation.watchPosition((position) => {
         const {latitude, longitude} = position.coords;
         socket.emit("sendLocation", {latitude, longitude});
-        // Show your location instantly
-        map.setView([latitude, longitude], 16);
-        if (!myMarker) {
-            myMarker = L.marker([latitude, longitude]).addTo(map);
-        } else {
-            myMarker.setLatLng([latitude, longitude]);
+        
+        // Center map only on first location update
+        if(!centerOnce) {
+            map.setView([latitude, longitude], 16);
+            centerOnce = true;
         }
     }, (error) => {
         console.error('Error getting location:', error);
@@ -25,27 +25,43 @@ if(navigator.geolocation) {
     {
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge : 0,
+        maximumAge: 0,
     });
 }
 
-// For other users' locations (if needed)
-const markers = {};
 socket.on("Location-recived", (data) => {
     const {id, latitude, longitude} = data;
-    // Always update/add marker for every user (including yourself)
-    if (markers[id]) {
+    
+    console.log('Received location:', id, latitude, longitude); // Debug log
+    
+    if(latitude === null || longitude === null) {
+        if(markers[id]) {
+            map.removeLayer(markers[id]);
+            delete markers[id];
+        }
+        return;
+    }
+    
+    if(markers[id]) {
         markers[id].setLatLng([latitude, longitude]);
     } else {
-        markers[id] = L.marker([latitude, longitude]).addTo(map);
+        // Add marker with a label to distinguish users
+        markers[id] = L.marker([latitude, longitude])
+            .bindPopup(`User: ${id.substring(0, 5)}`)
+            .addTo(map);
+    }
+    
+    console.log('Total markers:', Object.keys(markers).length); // Debug log
+});
+
+socket.on("user-disconnected", (id) => {
+    console.log('User disconnected:', id); // Debug log
+    if(markers[id]) {
+        map.removeLayer(markers[id]);
+        delete markers[id];
     }
 });
+
 socket.on("disconnect", () => {
     console.log('Socket disconnected');
-    // Optionally remove the marker for this user
-    if (myMarker) {
-        map.removeLayer(myMarker);
-        myMarker = null;
-    }
 });
-  

@@ -12,15 +12,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', (socket) => {
   socket.on('sendLocation', (data) => {
-    io.emit("Location-recived", {id : socket.id, ...data});
+    io.emit("Location-recived", {id: socket.id, ...data});
   });
       
   socket.on('disconnect', () => {
-    console.log('User disconnected');
-    // Optionally remove the marker for this user
-    io.emit("Location-recived", {id : socket.id, latitude: null, longitude: null});
+    console.log('User disconnected:', socket.id);
+    io.emit("user-disconnected", socket.id);
   });
 });
+
 
 app.get('/', function(req, res) {
   console.log('Rendering index.ejs');
@@ -29,4 +29,6 @@ app.get('/', function(req, res) {
 
 
 
-server.listen(3000);
+server.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+});
